@@ -1,0 +1,36 @@
+{
+  "name": "codex-agent-management",
+  "version": "1.0.0",
+  "description": "API that manage each codex session.",
+  "homepage": "https://github.com/Tafka-4/codex-agent-management#readme",
+  "bugs": {
+    "url": "https://github.com/Tafka-4/codex-agent-management/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tafka-4/codex-agent-management.git"
+  },
+  "license": "BSD-2-Clause",
+  "author": "Tafka4",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "prestart": "npm run build",
+    "start": "node dist/index.js",
+    "dev": "ts-node --esm --experimentalSpecifierResolution=node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@openai/codex-sdk": "^0.57.0",
+    "express": "^5.1.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/node": "^24.10.0",
+    "@types/ws": "^8.5.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
+  }
+}
