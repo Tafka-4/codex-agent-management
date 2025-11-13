@@ -18,8 +18,8 @@ export interface AgentStructuredOutput {
 	inferenceStatus: AgentInferenceStatus;
 	summary: string;
 	flag: string | null;
-	solveCode: string | null;
-	writeUp: string | null;
+	solveCodePath: string | null;
+	writeUpPath: string | null;
 	solutionFiles: AgentGeneratedFile[] | null;
 	nextSteps: string[] | null;
 }
@@ -41,15 +41,15 @@ export const agentOutputSchema = {
 			type: ["string", "null"],
 			description: "Captured flag value when available. Null until confirmed.",
 		},
-		solveCode: {
+		solveCodePath: {
 			type: ["string", "null"],
 			description:
-				"Inline source code or exploit script that demonstrates the solution. Provide the exact script used once solved; use null if still working.",
+				"Path to the executable exploit or solution script included within `solutionFiles`. Always provide a file when the challenge is solved.",
 		},
-		writeUp: {
+		writeUpPath: {
 			type: ["string", "null"],
 			description:
-				"Concise write-up that explains the vulnerability, methodology, and reproduction steps. Populate once findings are concrete; use null while pending.",
+				"Path to a Markdown (`.md`) write-up file included within `solutionFiles` that documents the approach and reproduction steps.",
 		},
 			solutionFiles: {
 			type: ["array", "null"],
@@ -79,7 +79,7 @@ export const agentOutputSchema = {
 			items: { type: "string" },
 		},
 	},
-	required: ["inferenceStatus", "summary", "flag", "solveCode", "writeUp", "solutionFiles", "nextSteps"],
+	required: ["inferenceStatus", "summary", "flag", "solveCodePath", "writeUpPath", "solutionFiles", "nextSteps"],
 	additionalProperties: false,
 } as const;
 
@@ -230,24 +230,24 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 		return false;
 	}
 
-	if (!("solveCode" in record)) {
+	if (!("solveCodePath" in record)) {
 		return false;
 	}
 
 	if (
-		record.solveCode !== null &&
-		typeof record.solveCode !== "string"
+		record.solveCodePath !== null &&
+		typeof record.solveCodePath !== "string"
 	) {
 		return false;
 	}
 
-	if (!("writeUp" in record)) {
+	if (!("writeUpPath" in record)) {
 		return false;
 	}
 
 	if (
-		record.writeUp !== null &&
-		typeof record.writeUp !== "string"
+		record.writeUpPath !== null &&
+		typeof record.writeUpPath !== "string"
 	) {
 		return false;
 	}
@@ -256,6 +256,7 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 		return false;
 	}
 
+	const hasSolutionFiles = record.solutionFiles !== null;
 	if (record.solutionFiles !== null) {
 		if (!Array.isArray(record.solutionFiles)) {
 			return false;
@@ -276,6 +277,33 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 		}
 
 		if (!record.nextSteps.every((item) => typeof item === "string")) {
+			return false;
+		}
+	}
+
+	if (record.solveCodePath !== null) {
+		if (!hasSolutionFiles) {
+			return false;
+		}
+		const hasCodeFile = Array.isArray(record.solutionFiles)
+			? record.solutionFiles.some((file) => file?.path === record.solveCodePath)
+			: false;
+		if (!hasCodeFile) {
+			return false;
+		}
+	}
+
+	if (record.writeUpPath !== null) {
+		if (!hasSolutionFiles) {
+			return false;
+		}
+		if (typeof record.writeUpPath === "string" && !record.writeUpPath.toLowerCase().endsWith(".md")) {
+			return false;
+		}
+		const hasWriteUpFile = Array.isArray(record.solutionFiles)
+			? record.solutionFiles.some((file) => file?.path === record.writeUpPath)
+			: false;
+		if (!hasWriteUpFile) {
 			return false;
 		}
 	}
