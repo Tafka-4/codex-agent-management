@@ -57,7 +57,7 @@ export const agentOutputSchema = {
 						description: "Short explanation of the file's purpose.",
 					},
 				},
-				required: ["path"],
+				required: ["path", "content", "description"],
 				additionalProperties: false,
 			},
 		},
