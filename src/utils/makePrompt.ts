@@ -25,7 +25,8 @@ export const reqPrompt = async (
 		"3. When you reach a conclusion, respond with JSON that conforms to the schema below.",
 		"4. Populate `inferenceStatus` with `solved` once a verified flag or working exploit is ready. Use `awaiting_hint` when blocked or requiring more information. Use `failed` only for unrecoverable conditions.",
 		"5. Include the primary exploit or solution artifacts via `solutionFiles` with inline content when feasible. Ensure any recovered flag is placed in the `flag` field verbatim.",
-		"6. If awaiting hints, provide concrete `nextSteps` describing the assistance you need.",
+		"6. Populate `solveCode` with the exact script or command sequence that proves the solve (base64 encode binaries if needed), and summarize the exploitation methodology in `writeUp` when conclusions are reached.",
+		"7. If awaiting hints, provide concrete `nextSteps` describing the assistance you need.",
 		"## Structured Output Schema",
 		schemaInstructions,
 	].join("\n\n");

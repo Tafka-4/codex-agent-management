@@ -682,6 +682,8 @@ export class SessionManager {
 			inferenceStatus: structured.inferenceStatus,
 			summary: structured.summary,
 			flag: structured.flag ?? null,
+			solveCode: structured.solveCode ?? null,
+			writeUp: structured.writeUp ?? null,
 		};
 
 		if (structured.solutionFiles) {

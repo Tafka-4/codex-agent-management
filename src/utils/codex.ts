@@ -18,6 +18,8 @@ export interface AgentStructuredOutput {
 	inferenceStatus: AgentInferenceStatus;
 	summary: string;
 	flag: string | null;
+	solveCode: string | null;
+	writeUp: string | null;
 	solutionFiles: AgentGeneratedFile[] | null;
 	nextSteps: string[] | null;
 }
@@ -35,11 +37,21 @@ export const agentOutputSchema = {
 			type: "string",
 			description: "Concise status update summarizing the agent's findings or blockers.",
 		},
-	flag: {
-		type: ["string", "null"],
-		description: "Captured flag value when available. Null if not yet captured.",
-	},
-		solutionFiles: {
+		flag: {
+			type: ["string", "null"],
+			description: "Captured flag value when available. Null until confirmed.",
+		},
+		solveCode: {
+			type: ["string", "null"],
+			description:
+				"Inline source code or exploit script that demonstrates the solution. Provide the exact script used once solved; use null if still working.",
+		},
+		writeUp: {
+			type: ["string", "null"],
+			description:
+				"Concise write-up that explains the vulnerability, methodology, and reproduction steps. Populate once findings are concrete; use null while pending.",
+		},
+			solutionFiles: {
 			type: ["array", "null"],
 			description:
 				"Artifacts generated while solving the challenge. Include the primary exploit script or supporting files with inline contents when feasible.",
@@ -61,13 +73,13 @@ export const agentOutputSchema = {
 				additionalProperties: false,
 			},
 		},
-		nextSteps: {
+			nextSteps: {
 			type: ["array", "null"],
 			description: "If awaiting hints, list concrete next actions that would benefit from user guidance.",
 			items: { type: "string" },
 		},
 	},
-	required: ["inferenceStatus", "summary", "flag", "solutionFiles", "nextSteps"],
+	required: ["inferenceStatus", "summary", "flag", "solveCode", "writeUp", "solutionFiles", "nextSteps"],
 	additionalProperties: false,
 } as const;
 
@@ -214,6 +226,28 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 	if (
 		record.flag !== null &&
 		typeof record.flag !== "string"
+	) {
+		return false;
+	}
+
+	if (!("solveCode" in record)) {
+		return false;
+	}
+
+	if (
+		record.solveCode !== null &&
+		typeof record.solveCode !== "string"
+	) {
+		return false;
+	}
+
+	if (!("writeUp" in record)) {
+		return false;
+	}
+
+	if (
+		record.writeUp !== null &&
+		typeof record.writeUp !== "string"
 	) {
 		return false;
 	}
