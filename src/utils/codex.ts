@@ -35,10 +35,10 @@ export const agentOutputSchema = {
 			type: "string",
 			description: "Concise status update summarizing the agent's findings or blockers.",
 		},
-		flag: {
-			type: ["string", "null"],
-			description: "Captured flag value when available. Null if not yet captured.",
-		},
+	flag: {
+		type: ["string", "null"],
+		description: "Captured flag value when available. Null if not yet captured.",
+	},
 		solutionFiles: {
 			type: "array",
 			description:
