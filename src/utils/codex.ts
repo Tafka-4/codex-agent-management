@@ -17,9 +17,9 @@ export interface AgentGeneratedFile {
 export interface AgentStructuredOutput {
 	inferenceStatus: AgentInferenceStatus;
 	summary: string;
-	flag?: string | null;
-	solutionFiles?: AgentGeneratedFile[];
-	nextSteps?: string[];
+	flag: string | null;
+	solutionFiles: AgentGeneratedFile[] | null;
+	nextSteps: string[] | null;
 }
 
 export const agentOutputSchema = {
@@ -40,7 +40,7 @@ export const agentOutputSchema = {
 		description: "Captured flag value when available. Null if not yet captured.",
 	},
 		solutionFiles: {
-			type: "array",
+			type: ["array", "null"],
 			description:
 				"Artifacts generated while solving the challenge. Include the primary exploit script or supporting files with inline contents when feasible.",
 			items: {
@@ -62,12 +62,12 @@ export const agentOutputSchema = {
 			},
 		},
 		nextSteps: {
-			type: "array",
+			type: ["array", "null"],
 			description: "If awaiting hints, list concrete next actions that would benefit from user guidance.",
 			items: { type: "string" },
 		},
 	},
-	required: ["inferenceStatus", "summary"],
+	required: ["inferenceStatus", "summary", "flag", "solutionFiles", "nextSteps"],
 	additionalProperties: false,
 } as const;
 
@@ -207,15 +207,22 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 		return false;
 	}
 
+	if (!("flag" in record)) {
+		return false;
+	}
+
 	if (
-		record.flag != null &&
-		typeof record.flag !== "string" &&
-		record.flag !== null
+		record.flag !== null &&
+		typeof record.flag !== "string"
 	) {
 		return false;
 	}
 
-	if (record.solutionFiles != null) {
+	if (!("solutionFiles" in record)) {
+		return false;
+	}
+
+	if (record.solutionFiles !== null) {
 		if (!Array.isArray(record.solutionFiles)) {
 			return false;
 		}
@@ -225,7 +232,11 @@ const isAgentStructuredOutput = (value: unknown): value is AgentStructuredOutput
 		}
 	}
 
-	if (record.nextSteps != null) {
+	if (!("nextSteps" in record)) {
+		return false;
+	}
+
+	if (record.nextSteps !== null) {
 		if (!Array.isArray(record.nextSteps)) {
 			return false;
 		}
