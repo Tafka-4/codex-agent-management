@@ -6,7 +6,7 @@ import { registerWebsocketServer } from "./websocket.js";
 const app = express();
 
 app.disable("x-powered-by");
-app.use(express.json({ limit: "512kb" }));
+app.use(express.json());
 
 app.use("/api", indexRouter);
 
